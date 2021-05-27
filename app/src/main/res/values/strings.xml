@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">graduationProject</string>
+    <string name="app_name">Vision</string>
+    <string name="setting_button_name">Settings</string>
 </resources>

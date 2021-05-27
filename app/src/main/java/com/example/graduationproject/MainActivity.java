@@ -2,6 +2,7 @@ package com.example.graduationproject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.camera.core.Preview;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -23,6 +24,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.Surface;
 import android.view.TextureView;
 import android.widget.Toast;
@@ -41,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 툴바 적용
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+
+        // 권한 파악
         int perm = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
 
         if (perm != PackageManager.PERMISSION_GRANTED) {
@@ -50,12 +58,30 @@ public class MainActivity extends AppCompatActivity {
                     PERMISSION_CAMERA);
         }
         else { //권한 승인 상태
-            //카메라 띄우기
             mTextureView = (TextureView) findViewById(R.id.textureview);
-//            mPreview = new Preview(this, mTextureView);
             startCamera();
         }
 
+//            mPreview = new Preview(this, mTextureView);
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.actions, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.settings) {
+            // 설정 버튼을 눌렀을때 동작
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void onRequestPermissionsResult (int requestCode,
@@ -143,17 +169,17 @@ public class MainActivity extends AppCompatActivity {
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
             Preview();
-        }
+        } // 카메라 사용 가능
 
         @Override
         public void onDisconnected(@NonNull CameraDevice camera) {
 
-        }
+        } // 연결 끊김
 
         @Override
         public void onError(@NonNull CameraDevice camera, int error) {
 
-        }
+        } // 에러
     };
 
     protected void Preview() {
@@ -177,17 +203,16 @@ public class MainActivity extends AppCompatActivity {
                 public void onConfigured(@NonNull CameraCaptureSession session) {
                     cameraCaptureSession = session;
                     updatePreview();
-                }
+                } // 카메라 준비 완료
 
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession session) {
 
-                }
+                } // configure 실패
             }, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
-
     }
 
     private void updatePreview() {
@@ -202,7 +227,8 @@ public class MainActivity extends AppCompatActivity {
         Handler backgroundHandler = new Handler(thread.getLooper());
 
         try {
-            cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, backgroundHandler);
+            cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(),
+                    null, backgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
